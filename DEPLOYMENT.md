@@ -19,7 +19,7 @@
 | `METING_COOKIE_NETEASE` | 可选，网易云登录 Cookie。不要提交到 Git。 |
 | `METING_COOKIE_ALLOW_HOSTS` | 可选，允许使用登录 Cookie 的来源主机名，以逗号分隔。 |
 
-已配置网易云登录 Cookie，允许来源为 `blog.hoshizukimio.com` 和 `meting-api.hoshizukimio.com`。登录失效时需要更新 `METING_COOKIE_NETEASE` 并重新部署。播放权限和返回的音频时长由音乐平台及账号权限决定。
+已配置网易云登录 Cookie，允许来源为 `blog.hoshizukimio.com`、`meting-api.hoshizukimio.com`、`www.hoshizukimio.com` 和 `hoshizukimio.com`。登录失效时需要更新 `METING_COOKIE_NETEASE` 并重新部署。播放权限和返回的音频时长由音乐平台及账号权限决定。
 
 ## 后续同步上游
 
