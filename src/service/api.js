@@ -46,7 +46,8 @@ export default async (request, ctx) => {
   }
 
   // 4. 调用 API
-  const cacheKey = `${server}/${type}/${id}`
+  const allowCookie = isAllowedHost(request.headers.get('referer'))
+  const cacheKey = `${server}/${type}/${id}/${allowCookie ? 'cookie' : 'anonymous'}`
   let data = cache.get(cacheKey)
   if (data === undefined) {
     ctx.responseHeaders.set('x-cache', 'miss')
@@ -54,8 +55,7 @@ export default async (request, ctx) => {
     meting.format(true)
 
     // 检查 referrer 并配置 cookie
-    const referrer = request.headers.get('referer')
-    if (isAllowedHost(referrer)) {
+    if (allowCookie) {
       const cookie = await readCookieFile(server)
       if (cookie) {
         meting.cookie(cookie)
