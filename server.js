@@ -1,13 +1,24 @@
-// Vercel's Bun preset discovers this entrypoint and serves the upstream app.
-const upstreamFetch = globalThis.fetch
-globalThis.fetch = async (...args) => {
-  const response = await upstreamFetch(...args)
-  if (String(args[0]).includes('/eapi/song/enhance/player/url')) {
-    try {
-      const body = await response.clone().json()
-      console.log(JSON.stringify({ diagnostic: 'netease-url', httpStatus: response.status, code: body.code, data: body.data?.map(x => ({ code: x.code, urlPresent: Boolean(x.url), fee: x.fee, trial: Boolean(x.freeTrialInfo) })) }))
-    } catch { console.log('netease-url diagnostic: non-JSON response') }
+import Meting from '@meting/core'
+Bun.serve({
+  async fetch() {
+    const results = []
+    const id = '2625361488'
+    const variants = [
+      ['default', undefined],
+      ['numeric-array', c => { c.body.ids = [Number(id)] }],
+      ['stringified', c => { c.body.ids = JSON.stringify([id]) }],
+      ['https', c => { c.url = c.url.replace('http:', 'https:') }],
+      ['interface-v1', c => { c.url = 'https://interface.music.163.com/api/song/enhance/player/url/v1'; c.body = { ids: JSON.stringify([id]), level: 'standard', encodeType: 'flac' } }]
+    ]
+    for (const [name, change] of variants) {
+      const meting = new Meting('netease')
+      const original = meting.provider.url.bind(meting.provider)
+      meting.provider.url = (...args) => { const c = original(...args); change?.(c); return c }
+      try {
+        const raw = JSON.parse(await meting.url(id))
+        results.push({ name, http: meting.info?.statusCode, code: raw.code, data: raw.data?.map(x => ({ id:x.id, code:x.code, fee:x.fee, url:Boolean(x.url), trial:Boolean(x.freeTrialInfo) })) })
+      } catch (error) { results.push({ name, error: error.message }) }
+    }
+    return Response.json(results)
   }
-  return response
-}
-await import('./src/index.js')
+})
