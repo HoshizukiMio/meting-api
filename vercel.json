@@ -1,11 +1,6 @@
 {
-    "env": {
-        "RUNTIME": "vercel"
-    },
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/api"
-        }
-    ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "bun",
+  "bunVersion": "1.x",
+  "installCommand": "bun install --frozen-lockfile"
 }
